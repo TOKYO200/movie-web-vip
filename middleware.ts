@@ -17,9 +17,27 @@ const LOCALE_COOKIE_MAX_AGE_SEC = 60 * 60 * 24 * 365;
  */
 function pickLocaleFromGeo(request: NextRequest): string | null {
   const country = request.geo?.country;
+  
+  // إذا لم يتمكن السيرفر من تحديد الدولة، نرجع null
   if (!country) return null;
-  return country === 'VN' ? 'vi' : 'en';
+
+  // خريطة اللغات حسب كود الدولة (تقدر تضيف وتعدل براحتك)
+  const countryToLocale: Record<string, string> = {
+    'VN': 'vi', // فيتنام
+    'JO': 'ar', // الأردن
+    'SA': 'ar', // السعودية
+    'EG': 'ar', // مصر
+    'AE': 'ar', // الإمارات
+    'MA': 'ar', // المغرب
+    'FR': 'fr', // فرنسا
+    'ES': 'es'  // إسبانيا
+  };
+
+  // يبحث عن الدولة في الخريطة، إذا لقاها بيعطيها لغتها
+  // إذا الدولة مش موجودة في القائمة، بيعطي إنجليزي 'en' كافتراضي
+  return countryToLocale[country] || 'en';
 }
+
 
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
